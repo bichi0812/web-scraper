@@ -9,9 +9,10 @@ from get_site_code import *
 from bs4 import BeautifulSoup
 import pandas
 import re
+from datetime import datetime
 
 
-url = "https://thepythonguru.com/what-is-if-__name__-__main__/"
+url = "https://blog.feedspot.com/machine_learning_blogs/"
 
 
 def visible(element):
@@ -21,6 +22,9 @@ def visible(element):
         return False
     return True
 
+def get_text(page):
+    # getting meta properties
+    title = soup.title
 if __name__ == "__main__":
     # collect data of website whether it is active ot not
     ret_code = get_website_health(url)
@@ -38,13 +42,25 @@ if __name__ == "__main__":
 
         # implementing BeautifulSoup
         soup = BeautifulSoup(the_page, 'html.parser')
-
+        # print the_page
         # Extracting all possible urls
-        links = [l.get('href') for l in soup.find_all('a') if bool(re.match(r'http.*',l.get('href'),re.I))]
+        #links = [l.get('href') for l in soup.find_all('a') if bool(re.match(r'http.*',l.get('href'),re.I))]
+        links = set(re.findall(r'href="(http.*?)"',the_page,re.M))
+        for i in links: print i
 
+        # preparing timestamp
+        current_time = datetime.now()
+        year = str(current_time.year)
+        month = str(current_time.month)
+        day = str(current_time.day)
+        timestamp = year+month+day
+        #writing all the links to a text file
+        with open("saved_links.txt",'a') as f:
+            f.write("\n".join(links)+"\n")
+        print "links saved to local text file !"
         # operations on text
         data = soup.findAll(text=True)
-        print soup.text.strip()
+        # print soup.text.strip()
 
 
         result = filter(visible, data)
